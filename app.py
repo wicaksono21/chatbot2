@@ -54,12 +54,12 @@ if prompt:
             "Additional Guidelines:\n"
             "   • Partial Responses: Provide only snippets or partial responses to guide the student in writing their essay.\n"
             "   • Interactive Assistance: Engage the student in an interactive manner, encouraging them to think and write independently.\n"
-            "   • Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response.\n"
+            "   • Clarifications: Always ask for clarification if the student's request is unclear."
         )
     }
 
     # Generate a response from the OpenAI API including the system prompt
-    response = client.chat_completions.create(
+    response = client.Completion.create(
         model=st.session_state["openai_model"],
         messages=[system_prompt] + [{"role": m["role"], "content": m["content"]} for m in st.session_state["messages"]],
         temperature=1,
@@ -68,8 +68,8 @@ if prompt:
     )
 
     # Check for valid response and append to conversation
-    if response.choices:
-        response_text = response.choices[0].message.content if response.choices[0].message else "No response generated."
+    if response['choices']:
+        response_text = response['choices'][0]['message']['content'] if 'message' in response['choices'][0] else "No response generated."
         st.session_state["messages"].append({"role": "assistant", "content": response_text})
         
         # Display the response using Streamlit's chat_message component
