@@ -1,6 +1,8 @@
 import openai
 import streamlit as st
 
+openai migrate
+
 st.title("Essay Writing Assistant")
 
 # Set up OpenAI client with API key from Streamlit's secrets
