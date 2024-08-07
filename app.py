@@ -3,8 +3,11 @@ import streamlit as st
 
 st.title("Essay Writing Assistant")
 
-# Initialize the OpenAI client with API key from Streamlit's secrets
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# Ensure that your API key is being loaded properly
+if "OPENAI_API_KEY" not in st.secrets:
+    st.error("API key not found. Please set up your 'OPENAI_API_KEY' in secrets.")
+else:
+    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # Set the default model if not in session state
 if "openai_model" not in st.session_state:
