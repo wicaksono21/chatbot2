@@ -1,5 +1,6 @@
 import openai
 import streamlit as st
+openai migrate
 
 st.title("Essay Writing Assistant")
 
