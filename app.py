@@ -91,7 +91,7 @@ if user_input := st.chat_input("Type your message here:"):
 if st.checkbox("Show Full Conversation History"):
     for message in st.session_state["messages"]:
         st.write(f"{message['role'].capitalize()}: {message['content']}")
-"
+
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
