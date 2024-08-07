@@ -1,3 +1,5 @@
+pip install openai==0.28
+
 from openai import OpenAI
 import streamlit as st
 import openai  # Ensure openai is imported correctly
