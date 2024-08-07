@@ -3,16 +3,16 @@ import streamlit as st
 
 st.title("Essay Writing Assistant")
 
-# Initialize the OpenAI client with the API key from Streamlit's secrets
+# Set up OpenAI client with API key from Streamlit's secrets
 if "OPENAI_API_KEY" not in st.secrets:
     st.error("API key not found. Please set up your 'OPENAI_API_KEY' in secrets.")
 else:
-    # API initialization with the new library
+    # Set the API key for the session
     openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Set the default model if not in session state
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "gpt-4o-mini"  # Use gpt-4 for the latest features, adjust as needed
+    st.session_state["openai_model"] = "gpt-4o-mini"  # Example: change as needed based on subscription
 
 # Initialize messages in session state if not already there
 if "messages" not in st.session_state:
@@ -31,10 +31,13 @@ if prompt:
     # Append user message to the conversation
     st.session_state["messages"].append({"role": "user", "content": prompt})
     
-    # Construct messages for API call, including your custom system prompt
-    messages = [
-        {
-            "role": "system",
+    # Generate a response using the OpenAI Chat API
+    try:
+        response = openai.ChatCompletion.create(
+            model=st.session_state["openai_model"],
+            messages=[
+                {
+                    "role": "system",
             "content": (
                 "Role: Essay Writing Assistant (300-500 words)\n"
                 "Response Length: keep answers brief and to the point. Max. 50 words per response.\n"
@@ -57,23 +60,19 @@ if prompt:
                 "   • Partial Responses: Provide only snippets or partial responses to guide the student in writing their essay.\n"
                 "   • Interactive Assistance: Engage the student in an interactive manner, encouraging them to think and write independently.\n"
                 "   • Clarifications: Always ask for clarification if the student's request is unclear."
-            )
-        }
-    ] + [{"role": m["role"], "content": m["content"]} for m in st.session_state["messages"]]
-    
-    # Generate a response using the new Chat API
-    response = openai.ChatCompletion.create(
-        model=st.session_state["openai_model"],
-        messages=messages,
-        temperature=1,
-        max_tokens=150
-    )
-
-    # Check for valid response and append to conversation
-    if response.choices:
-        response_text = response.choices[0].message['content'] if 'message' in response.choices[0] else "No response generated."
+                    )
+                },
+                *st.session_state["messages"]
+            ],
+            temperature=0.7,
+            max_tokens=150
+        )
+        # Extract the content from the response
+        response_text = response['choices'][0]['message']['content']
         st.session_state["messages"].append({"role": "assistant", "content": response_text})
         
         # Display the response using Streamlit's chat_message component
         with st.chat_message("assistant"):
             st.markdown(response_text)
+    except Exception as e:
+        st.error(f"Failed to generate response: {e}")
