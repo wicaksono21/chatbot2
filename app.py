@@ -1,5 +1,6 @@
 from openai import OpenAI
 import streamlit as st
+import openai  # Ensure openai is imported correctly
 
 st.title("Essay Writing Assistant")
 
@@ -7,7 +8,8 @@ st.title("Essay Writing Assistant")
 if "OPENAI_API_KEY" not in st.secrets:
     st.error("API key not found. Please set up your 'OPENAI_API_KEY' in secrets.")
 else:
-    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+    # Create an instance of the OpenAI client
+    client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # Set the default model if not in session state
 if "openai_model" not in st.session_state:
@@ -59,12 +61,11 @@ if prompt:
     }
 
     # Generate a response from the OpenAI API including the system prompt
-    response = client.Completion.create(
+    response = openai.ChatCompletion.create(
         model=st.session_state["openai_model"],
         messages=[system_prompt] + [{"role": m["role"], "content": m["content"]} for m in st.session_state["messages"]],
         temperature=1,
-        max_tokens=150,
-        stop=None
+        max_tokens=150
     )
 
     # Check for valid response and append to conversation
