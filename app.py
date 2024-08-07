@@ -10,7 +10,7 @@ else:
     openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "import openai
+    st.session_state["openai_model"] = "import openai"
 import streamlit as st
 
 st.title("Essay Writing Assistant")
