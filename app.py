@@ -12,7 +12,7 @@ else:
 
 # Set the default model if not in session state
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "gpt-4o-mini  # Use gpt-4 for the latest features, adjust as needed
+    st.session_state["openai_model"] = "gpt-4o-mini"  # Use gpt-4 for the latest features, adjust as needed
 
 # Initialize messages in session state if not already there
 if "messages" not in st.session_state:
