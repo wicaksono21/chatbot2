@@ -1,8 +1,8 @@
 import streamlit as st
-from openai import OpenAI
+import openai
 
 # Set up the OpenAI client with the API key from Streamlit secrets
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Streamlit app title
 st.title("Essay Writing Assistant")
@@ -29,8 +29,8 @@ if prompt := st.chat_input("Ask me anything about essay writing:"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        response = client.chat.completions.create(
-            model="gpt-4o",
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
             messages=[
                 system_prompt,
                 *st.session_state.messages
@@ -41,7 +41,7 @@ if prompt := st.chat_input("Ask me anything about essay writing:"):
             frequency_penalty=0,
             presence_penalty=0
         )
-        response_content = response.choices[0].message['content']
+        response_content = response['choices'][0]['message']['content']
         st.markdown(response_content)
 
     st.session_state.messages.append({"role": "assistant", "content": response_content})
