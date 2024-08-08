@@ -41,7 +41,7 @@ if prompt := st.chat_input("Ask me anything about essay writing:"):
             frequency_penalty=0,
             presence_penalty=0
         )
-        response_content = response['choices'][0]['message']['content']
+        response_content = response.choices[0].message['content']
         st.markdown(response_content)
 
     st.session_state.messages.append({"role": "assistant", "content": response_content})
