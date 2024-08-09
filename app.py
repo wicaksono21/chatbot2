@@ -29,7 +29,7 @@ if prompt := st.chat_input("Ask me anything about essay writing:"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        response = openai.Completion.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4o-mini",
             messages=[
                 system_prompt,
