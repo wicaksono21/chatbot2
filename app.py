@@ -184,7 +184,7 @@ if prompt := st.chat_input():
       #  messages=st.session_state["messages"],
        # temperature=0.7,
         # max_tokens=150
-    )
+   # )
     
     #msg = response.choices[0].message.content  # Fixed to correctly access content
     #st.session_state["messages"].append({"role": "assistant", "content": msg})
