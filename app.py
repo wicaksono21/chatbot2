@@ -94,10 +94,11 @@ st.title("💬 Essay Writing Assistant Chatbot-3")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI")
 
 # Load previous chat history
-if "messages" not in st.session_state:
-    st.session_state["messages"] = retrieve_chat_logs()
+#if "messages" not in st.session_state:
+#    st.session_state["messages"] = retrieve_chat_logs()
 
-if not st.session_state["messages"]:
+if "messages" not in st.session_state:
+    # Update the system prompt with the new detailed instructions
     st.session_state["messages"] = [
         {"role": "system", "content": """
 Role: Essay Writing Assistant (300-500 words)
@@ -136,8 +137,8 @@ Additional Guidelines:
     • Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response.
         """}
     ]
-    st.session_state["messages"].append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
-    store_chat_log(" Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
+    st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
+    #store_chat_log(" Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
 
 # Display chat messages
 for msg in st.session_state["messages"]:
