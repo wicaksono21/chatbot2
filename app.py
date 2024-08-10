@@ -159,7 +159,7 @@ Additional Guidelines:
         """},
         {"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"}
     ]
-    chat_id = f"chat_{st.session_state['user'].uid}_{st.time()}"
+    chat_id = f"chat_{st.session_state['user'].uid}_{int(time.time())}"
     st.session_state['chat_id'] = chat_id
     store_chat_log(chat_id, " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
     # st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
