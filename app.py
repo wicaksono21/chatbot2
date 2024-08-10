@@ -169,7 +169,8 @@ for msg in st.session_state["messages"]:
 if prompt := st.chat_input():
     st.session_state["messages"].append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
-    store_chat_log(prompt, role="user")
+    #store_chat_log(prompt, role="user")
+    store_chat_log(st.session_state['chat_id'], prompt, role="user")  # Pass chat_id
 
     # Simulate AI response using OpenAI
     client = OpenAI(api_key=openai_api_key)
@@ -183,4 +184,6 @@ if prompt := st.chat_input():
     msg = response.choices[0].message.content  # Fixed to correctly access content
     st.session_state["messages"].append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
-    store_chat_log(msg, role="assistant")
+    #store_chat_log(msg, role="assistant")
+    store_chat_log(st.session_state['chat_id'], msg, role="assistant")  # Pass chat_id
+
