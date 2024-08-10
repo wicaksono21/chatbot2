@@ -2,6 +2,7 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 from openai import OpenAI
+import os
 
 # Check if Firebase app is already initialized
 if not firebase_admin._apps:
@@ -40,20 +41,21 @@ def login_user(email, password):
 def get_chat_collection():
     return db.collection('chat_logs').document(st.session_state['user'].uid)
 
-# Store Chat Log in Firestore
-def store_chat_log(message, role='user'):
+# Function to save chat log to Firestore
+def save_chat_log(messages):
     doc_ref = get_chat_collection()
-    doc = doc_ref.get()
+    doc_ref.set({"messages": messages}, merge=True)
     
-    if doc.exists:
-        chat_logs = doc.to_dict().get('messages', [])
-    else:
-        chat_logs = []
+    # Save to a text file
+    save_chat_log_to_txt(messages)
 
-    chat_logs.append({"role": role, "content": message})
-    doc_ref.set({"messages": chat_logs})
+# Function to save chat log to a .txt file
+def save_chat_log_to_txt(messages, filename="chat_log.txt"):
+    with open(filename, 'a') as file:
+        for message in messages:
+            file.write(f"{message['role']}: {message['content']}\n")
 
-# Retrieve Chat Log from Firestore
+# Function to retrieve chat logs from Firestore
 def retrieve_chat_logs():
     doc_ref = get_chat_collection()
     doc = doc_ref.get()
@@ -61,6 +63,28 @@ def retrieve_chat_logs():
         return doc.to_dict().get('messages', [])
     return []
 
+# Function to handle chat interactions and store logs
+def handle_chat(prompt):
+    # Append user message to chat history
+    st.session_state["messages"].append({"role": "user", "content": prompt})
+    st.chat_message("user").write(prompt)
+    
+    # Simulate AI response using OpenAI
+    client = OpenAI(api_key=openai_api_key)
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=st.session_state["messages"],
+        temperature=0.7,
+        max_tokens=150
+    )
+    
+    msg = response.choices[0].message.content
+    st.session_state["messages"].append({"role": "assistant", "content": msg})
+    st.chat_message("assistant").write(msg)
+    
+    # Automatically save chat logs
+    save_chat_log(st.session_state["messages"])
+    
 # Check login status
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
@@ -139,6 +163,7 @@ Additional Guidelines:
     ]
     st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
     #store_chat_log(" Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
+    save_chat_log(st.session_state["messages"])
 
 # Display chat messages
 for msg in st.session_state["messages"]:
@@ -147,20 +172,21 @@ for msg in st.session_state["messages"]:
 
 # Input for new messages
 if prompt := st.chat_input():
-    st.session_state["messages"].append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
-    store_chat_log(prompt, role="user")
+    handle_chat(prompt)
+    #st.session_state["messages"].append({"role": "user", "content": prompt})
+    #st.chat_message("user").write(prompt)
+    #store_chat_log(prompt, role="user")
 
     # Simulate AI response using OpenAI
-    client = OpenAI(api_key=openai_api_key)
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=st.session_state["messages"],
-        temperature=0.7,
-        max_tokens=150
+    #client = OpenAI(api_key=openai_api_key)
+    #response = client.chat.completions.create(
+     #   model="gpt-4o-mini",
+      #  messages=st.session_state["messages"],
+       # temperature=0.7,
+        # max_tokens=150
     )
     
-    msg = response.choices[0].message.content  # Fixed to correctly access content
-    st.session_state["messages"].append({"role": "assistant", "content": msg})
-    st.chat_message("assistant").write(msg)
-    store_chat_log(msg, role="assistant")
+    #msg = response.choices[0].message.content  # Fixed to correctly access content
+    #st.session_state["messages"].append({"role": "assistant", "content": msg})
+    #st.chat_message("assistant").write(msg)
+    #store_chat_log(msg, role="assistant")
