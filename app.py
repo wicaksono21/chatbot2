@@ -80,11 +80,12 @@ if not st.session_state['logged_in']:
             if user:
                 st.session_state['logged_in'] = True
                 st.session_state['user'] = user
-                st.experimental_rerun()
+                # Instead of rerunning, just show the logged-in state in the same session
+                st.experimental_set_query_params(logged_in="true")
     else:
         if st.button("Login"):
             if login_user(email, password):
-                st.experimental_rerun()
+                st.experimental_set_query_params(logged_in="true")
 
     st.stop()
 
