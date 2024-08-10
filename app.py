@@ -3,9 +3,10 @@ import firebase_admin
 from firebase_admin import credentials, auth, firestore
 from openai import OpenAI
 
-# Initialize Firebase Admin SDK
-cred = credentials.Certificate("essay-writing-assistant-firebase-adminsdk-rtrnk-f280b8aa38.json")
-firebase_admin.initialize_app(cred)
+# Check if Firebase app is already initialized
+if not firebase_admin._apps
+    cred = credentials.Certificate("essay-writing-assistant-firebase-adminsdk-rtrnk-f280b8aa38.json")
+    firebase_admin.initialize_app(cred)
 
 # Initialize Firestore DB
 db = firestore.client()
