@@ -60,8 +60,9 @@ def save_chat_log_to_storage(messages, filename="chat_log.txt"):
     with open(filename, 'w') as file:
         file.write(chat_content)
 
-    # Upload the file to Firebase Storage
-    bucket = storage.bucket()
+    # Upload the file to Firebase Storage, explicitly specifying the bucket name
+    bucket_name = 'essay-writing-assistant.appspot.com'
+    bucket = storage.bucket(bucket_name)
     blob = bucket.blob(f"chat_logs/{st.session_state['user'].uid}_{filename}")
     blob.upload_from_filename(filename)
 
@@ -70,6 +71,7 @@ def save_chat_log_to_storage(messages, filename="chat_log.txt"):
 
     st.success(f"Chat log saved to Firebase Storage. Access it [here]({blob.public_url}).")
     return blob.public_url
+
 
 # Function to retrieve chat logs from Firestore
 def retrieve_chat_logs():
