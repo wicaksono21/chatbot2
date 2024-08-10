@@ -1,9 +1,10 @@
 import streamlit as st
 import openai
+from openai import OpenAI
 
 # Attempt to retrieve the API key from Streamlit secrets
 try:
-    openai_api_key = st.secrets["default"]["OPENAI_API_KEY"]
+    openai.api_key = st.secrets["default"]["OPENAI_API_KEY"]
 except KeyError:
     st.error("API key not found! Please ensure that the OPENAI_API_KEY is correctly set in Streamlit secrets.")
     st.stop()
@@ -60,11 +61,11 @@ for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
 
 if prompt := st.chat_input():
-    if not openai_api_key:
+    if not openai.api_key:
         st.info("Please set your OPENAI_API_KEY environment variable.")
         st.stop()
 
-    client = openai(api_key=openai_api_key)
+    client = OpenAI(api_key=openai_api_key)
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
