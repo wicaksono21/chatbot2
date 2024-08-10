@@ -1,13 +1,15 @@
 import streamlit as st
 import firebase_admin
-from firebase_admin import credentials, auth, firestore
+from firebase_admin import credentials, auth, firestore, storage
 from openai import OpenAI
-import os
+
 
 # Check if Firebase app is already initialized
 if not firebase_admin._apps:
     cred = credentials.Certificate("essay-writing-assistant-firebase-adminsdk-rtrnk-f280b8aa38.json")
-    firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app(cred, {
+        'storageBucket': 'essay-writing-assistant.appspot.com'
+    })
 
 # Initialize Firestore DB
 db = firestore.client()
@@ -41,19 +43,33 @@ def login_user(email, password):
 def get_chat_collection():
     return db.collection('chat_logs').document(st.session_state['user'].uid)
 
-# Function to save chat log to Firestore
+# Function to save chat log to Firestore and Firebase Storage
 def save_chat_log(messages):
     doc_ref = get_chat_collection()
     doc_ref.set({"messages": messages}, merge=True)
     
-    # Save to a text file
-    save_chat_log_to_txt(messages)
+    # Save to a text file and upload to Firebase Storage
+    save_chat_log_to_storage(messages)
 
-# Function to save chat log to a .txt file
-def save_chat_log_to_txt(messages, filename="chat_log.txt"):
-    with open(filename, 'a') as file:
-        for message in messages:
-            file.write(f"{message['role']}: {message['content']}\n")
+# Function to save chat log to a .txt file and upload to Firebase Storage
+def save_chat_log_to_storage(messages, filename="chat_log.txt"):
+    # Convert messages to a single string
+    chat_content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
+    
+    # Save the chat log to a local .txt file
+    with open(filename, 'w') as file:
+        file.write(chat_content)
+
+    # Upload the file to Firebase Storage
+    bucket = storage.bucket()
+    blob = bucket.blob(f"chat_logs/{st.session_state['user'].uid}_{filename}")
+    blob.upload_from_filename(filename)
+
+    # Optionally, make the file publicly accessible
+    blob.make_public()
+
+    st.success(f"Chat log saved to Firebase Storage. Access it [here]({blob.public_url}).")
+    return blob.public_url
 
 # Function to retrieve chat logs from Firestore
 def retrieve_chat_logs():
@@ -82,7 +98,7 @@ def handle_chat(prompt):
     st.session_state["messages"].append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
     
-    # Automatically save chat logs
+    # Automatically save chat logs to Firestore and Firebase Storage
     save_chat_log(st.session_state["messages"])
     
 # Check login status
