@@ -38,28 +38,40 @@ def login_user(email, password):
 
 # Firestore Collection Reference for Chat Logs
 def get_chat_collection():
-    return db.collection('chat_logs').document(st.session_state['user'].uid)
+    return db.collection('chat_logs').document(st.session_state['user'].uid).collection('chats')
 
 # Store Chat Log in Firestore
-def store_chat_log(message, role='user'):
-    doc_ref = get_chat_collection()
-    doc = doc_ref.get()
-    
-    if doc.exists:
-        chat_logs = doc.to_dict().get('messages', [])
-    else:
-        chat_logs = []
-
+def store_chat_log(chat_id, message, role='user'):
+    doc_ref = get_chat_collection().document(chat_id)
+    chat_logs = doc_ref.get().to_dict().get('messages', []) if doc_ref.get().exists else []
     chat_logs.append({"role": role, "content": message})
     doc_ref.set({"messages": chat_logs})
 
-# Retrieve Chat Log from Firestore
-def retrieve_chat_logs():
-    doc_ref = get_chat_collection()
+# Retrieve All Chat Logs for a User
+def retrieve_all_chat_logs():
+    chat_collection = get_chat_collection()
+    chat_docs = chat_collection.stream()
+    return {doc.id: doc.to_dict().get('messages', []) for doc in chat_docs}
+
+# Retrieve a Specific Chat Log by ID
+def retrieve_chat_log(chat_id):
+    doc_ref = get_chat_collection().document(chat_id)
     doc = doc_ref.get()
     if doc.exists:
         return doc.to_dict().get('messages', [])
     return []
+
+# Sidebar for Chat History
+def chat_sidebar():
+    st.sidebar.title("Chat History")
+    chat_logs = retrieve_all_chat_logs()
+
+    if chat_logs:
+        selected_chat = st.sidebar.selectbox("Select Chat", options=chat_logs.keys())
+        if selected_chat:
+            st.session_state["messages"] = chat_logs[selected_chat]
+    else:
+        st.sidebar.write("No chat history available.")
 
 # Check login status
 if 'logged_in' not in st.session_state:
@@ -93,10 +105,14 @@ openai_api_key = st.secrets["default"]["OPENAI_API_KEY"]
 st.title("💬 Essay Writing Assistant Chatbot-3")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI")
 
+# Display chat history in the sidebar
+chat_sidebar()
+
 # Load previous chat history
 #if "messages" not in st.session_state:
 #    st.session_state["messages"] = retrieve_chat_logs()
 
+# Initialize messages if not in session state
 if "messages" not in st.session_state:
     # Update the system prompt with the new detailed instructions
     st.session_state["messages"] = [
@@ -135,9 +151,13 @@ Additional Guidelines:
     • Partial Responses: Provide only snippets or partial responses to guide the student in writing their essay.
     • Interactive Assistance: Engage the student in an interactive manner, encouraging them to think and write independently.
     • Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response.
-        """}
+        """},
+        {"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"}
     ]
-    st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
+    chat_id = f"chat_{st.session_state['user'].uid}_{st.time()}"
+    st.session_state['chat_id'] = chat_id
+    store_chat_log(chat_id, " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
+    # st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
     #store_chat_log(" Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
 
 # Display chat messages
