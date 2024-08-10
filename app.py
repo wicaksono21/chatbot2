@@ -28,7 +28,8 @@ if not st.session_state["logged_in"]:
             st.session_state["logged_in"] = True
             st.session_state["username"] = username
             st.success(f"Logged in as {username}")
-            st.experimental_rerun()  # Rerun the app to move to the main UI
+            # Simulate a rerun by setting a query parameter
+            st.experimental_set_query_params(logged_in="true")
         else:
             st.error("Invalid username or password.")
     st.stop()
