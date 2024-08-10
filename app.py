@@ -10,9 +10,7 @@ users = {
 
 # Function to check login
 def check_login(username, password):
-    if username in users and users[username]["password"] == password:
-        return True
-    return False
+    return users.get(username, {}).get("password") == password
 
 # Login page
 if "logged_in" not in st.session_state:
@@ -23,13 +21,13 @@ if not st.session_state["logged_in"]:
     st.title("Login")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
-    if st.button("Login"):
+    login_button = st.button("Login")
+    
+    if login_button:
         if check_login(username, password):
             st.session_state["logged_in"] = True
             st.session_state["username"] = username
-            st.success(f"Logged in as {username}")
-            # Simulate a rerun by setting a query parameter
-            st.experimental_set_query_params(logged_in="true")
+            st.experimental_rerun()  # Rerun the app to show the main UI
         else:
             st.error("Invalid username or password.")
     st.stop()
