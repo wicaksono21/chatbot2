@@ -154,7 +154,7 @@ Additional Guidelines:
     • Interactive Assistance: Engage the student in an interactive manner, encouraging them to think and write independently.
     • Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response.
         """},
-        #{"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"}
+        {"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"}
     ]
     store_chat_log(chat_id, " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
 
