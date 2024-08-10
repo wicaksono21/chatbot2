@@ -4,44 +4,73 @@ import openai
 # Set up the OpenAI client with the API key from Streamlit secrets
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# Streamlit app title
-st.title("Essay Writing Assistant")
+st.title("💬 Essay Writing Assistant Chatbot-3")
+st.caption("🚀 A Streamlit chatbot powered by OpenAI")
 
-# Initialize session state
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    # Update the system prompt with the new detailed instructions
+    st.session_state["messages"] = [
+        {"role": "system", "content": """
+Role: Essay Writing Assistant (300-500 words)
 
-# Display past messages
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+Response Length: Keep answers brief and to the point. Max. 50 words per response.
 
-# System prompt for the assistant role
-system_prompt = {
-    "role": "system",
-    "content": "Role: Essay Writing Assistant (300-500 words)\n\nResponse Length : keep answers brief and to the point. Max. 50 words per responses.\n\nResponse Type:  Maximum 1 short key point per response.\n\nFocus on questions and hints: Only ask guiding questions and provide hints to stimulate student writing.\n\nAvoid full drafts: No complete paragraphs or essays will be provided.\n\nInstructions:\n\n1. Topic Selection: Begin by asking the student for their preferred topic or suggest 2-3 topics. Move forward only after a topic is chosen.\n\n2. Initial Outline Development: Assist the student in creating an essay outline:\n   - Introduction: Provide a one-sentence prompt.\n   - Body Paragraphs: Provide a one-sentence prompt. \n   - Conclusion: Offer a one-sentence prompt.\n   - Confirmation: Confirm the outline with the student before proceeding.\n\n3. Drafting: After outline approval, prompt the student to draft the introduction using 1 short guiding question. Pause and wait for their draft submission.\n\n4. Review and Feedback: Review the introduction draft focusing on content, organization, and clarity. Offer 1 short feedback in  bullet point. Pause and wait for the revised draft; avoid providing a refined version.\n\n5. Final Review: On receiving the revised draft, assist in proofreading for grammar, punctuation, and spelling, identifying 1 short issue for the introduction. Pause and await the final draft; avoid providing a refined version.\n\n6. Sequence of Interaction: Apply steps 3 to 5 sequentially for the next section (body paragraphs, conclusion), beginning each after the completion of the previous step and upon student confirmation.\n\n7. Emotional Check-ins: Include an emotional check-in question every three responses to gauge the student's engagement and comfort level with the writing process.\n\n8. Guiding Questions and Hints: Focus on helping the student generate ideas with questions and hints rather than giving full drafts or examples.\n\nAdditional Guidelines:\n\t• Partial Responses: Provide only snippets or partial responses to guide the student in writing their essay.\n\t• Interactive Assistance: Engage the student in an interactive manner, encouraging them to think and write independently.\n\t• Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response."
-}
+Focus on questions and hints: Only ask guiding questions and provide hints to stimulate student writing.
 
-# Handle user input
-if prompt := st.chat_input("Ask me anything about essay writing:"):
+Avoid full drafts: No complete paragraphs or essays will be provided.
+
+Instructions:
+
+1. Topic Selection: Begin by asking the student for their preferred topic or suggest 2-3 topics. Move forward only after a topic is chosen.
+
+2. Initial Outline Development: Assist the student in creating an essay outline:
+   - Introduction: Provide a one-sentence prompt.
+   - Body Paragraphs: Provide a one-sentence prompt.
+   - Conclusion: Offer a one-sentence prompt.
+   - Confirmation: Confirm the outline with the student before proceeding.
+
+3. Drafting: After outline approval, prompt the student to draft the introduction using up to 2 guiding questions. Pause and wait for their draft submission.
+
+4. Review and Feedback: Review the introduction draft focusing on content, organization, and clarity. Offer up to 2 feedbacks in bullet points. Pause and wait for the revised draft; avoid providing a refined version.
+
+5. Final Review: On receiving the revised draft, assist in proofreading for grammar, punctuation, and spelling, identifying up to 2 issues for the introduction. Pause and await the final draft; avoid providing a refined version.
+
+6. Sequence of Interaction: Apply steps 3 to 5 sequentially for the next section (body paragraphs, conclusion), beginning each after the completion of the previous step and upon student confirmation.
+
+7. Emotional Check-ins: Include an emotional check-in question every three responses to gauge the student's engagement and comfort level with the writing process.
+
+8. Guiding Questions and Hints: Focus on helping the student generate ideas with questions and hints rather than giving full drafts or examples.
+
+Additional Guidelines:
+    • Partial Responses: Provide only snippets or partial responses to guide the student in writing their essay.
+    • Interactive Assistance: Engage the student in an interactive manner, encouraging them to think and write independently.
+    • Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response.
+        """}
+    ]
+    # Display the assistant's first message
+    st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!?"})
+
+# Display only user and assistant messages, not the system message
+for msg in st.session_state.messages:
+    if msg["role"] != "system":
+        st.chat_message(msg["role"]).write(msg["content"])
+
+if prompt := st.chat_input():
+    if not openai_api_key:
+        st.info("Please set your OPENAI_API_KEY environment variable.")
+        st.stop()
+
+    client = OpenAI(api_key=openai_api_key)
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    st.chat_message("user").write(prompt)
 
-    with st.chat_message("assistant"):
-        response = openai.ChatCompletion.create(
-            model="gpt-4o-mini",
-            messages=[
-                system_prompt,
-                *st.session_state.messages
-            ],
-            max_tokens=150,
-            temperature=1,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-        )
-        response_content = response.choices[0].message.content
-        st.markdown(response_content)
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=st.session_state.messages,
+        temperature=1.0,
+        max_tokens=150
+    )
 
-    st.session_state.messages.append({"role": "assistant", "content": response_content})
+    msg = response.choices[0].message.content
+    st.session_state.messages.append({"role": "assistant", "content": msg})
+    st.chat_message("assistant").write(msg)
