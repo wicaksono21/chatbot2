@@ -4,7 +4,7 @@ from firebase_admin import credentials, auth, firestore
 from openai import OpenAI
 
 # Check if Firebase app is already initialized
-if not firebase_admin._apps
+if not firebase_admin._apps:
     cred = credentials.Certificate("essay-writing-assistant-firebase-adminsdk-rtrnk-f280b8aa38.json")
     firebase_admin.initialize_app(cred)
 
