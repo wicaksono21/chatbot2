@@ -100,6 +100,7 @@ if not st.session_state['logged_in']:
                 st.query_params = {"logged_in": "true"}  # Updated from deprecated experimental function
 
     st.stop()
+
 # User is logged in, continue with the chatbot
 openai_api_key = st.secrets["default"]["OPENAI_API_KEY"]
 
@@ -109,17 +110,13 @@ st.caption("🚀 A Streamlit chatbot powered by OpenAI")
 # Display chat history in the sidebar
 chat_sidebar()
 
-# Load previous chat history
-#if "messages" not in st.session_state:
-#    st.session_state["messages"] = retrieve_chat_logs()
-
 # Initialize messages if not in session state
 if "messages" not in st.session_state:
     # Generate a unique chat ID using the user's UID and the current time
     chat_id = f"chat_{st.session_state['user'].uid}_{int(time.time())}"
+    st.session_state['chat_id'] = chat_id  # Ensure chat_id is initialized
     
     # Update the system prompt with the new detailed instructions
-    st.session_state['chat_id'] = chat_id
     st.session_state["messages"] = [
         {"role": "system", "content": """
 Role: Essay Writing Assistant (300-500 words)
@@ -157,13 +154,9 @@ Additional Guidelines:
     • Interactive Assistance: Engage the student in an interactive manner, encouraging them to think and write independently.
     • Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response.
         """},
-        {"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"}
+        #{"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"}
     ]
-    chat_id = f"chat_{st.session_state['user'].uid}_{int(time.time())}"
-    st.session_state['chat_id'] = chat_id
     store_chat_log(chat_id, " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
-    # st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
-    #store_chat_log(" Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
 
 # Display chat messages
 for msg in st.session_state["messages"]:
@@ -174,21 +167,18 @@ for msg in st.session_state["messages"]:
 if prompt := st.chat_input():
     st.session_state["messages"].append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
-    #store_chat_log(prompt, role="user")
-    store_chat_log(st.session_state['chat_id'], prompt, role="user")  # Pass chat_id
+    store_chat_log(st.session_state['chat_id'], prompt, role="user")
 
     # Simulate AI response using OpenAI
     client = OpenAI(api_key=openai_api_key)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=st.session_state["messages"],
-        temperature=0.3,
+        temperature=0.3,  # Lower the temperature to make responses more focused
         max_tokens=150
     )
     
-    msg = response.choices[0].message.content  # Fixed to correctly access content
+    msg = response.choices[0].message.content
     st.session_state["messages"].append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
-    #store_chat_log(msg, role="assistant")
-    store_chat_log(st.session_state['chat_id'], msg, role="assistant")  # Pass chat_id
-
+    store_chat_log(st.session_state['chat_id'], msg, role="assistant")
