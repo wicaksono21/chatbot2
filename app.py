@@ -64,7 +64,7 @@ if prompt := st.chat_input():
         st.info("Please set your OPENAI_API_KEY environment variable.")
         st.stop()
 
-    client = OpenAI(api_key=openai_api_key)
+    client = openai(api_key=openai_api_key)
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
