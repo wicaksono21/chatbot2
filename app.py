@@ -53,8 +53,17 @@ def save_chat_log(messages):
 
 # Function to save chat log to a .txt file and upload to Firebase Storage
 def save_chat_log_to_storage(messages, filename="chat_log.txt"):
+    # Filter out the system messages
+    filtered_messages = [msg for msg in messages if msg['role'] != 'system']
+    
     # Convert messages to a single string
     chat_content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
+
+    # Create a filename based on user's email and current timestamp
+    user_email = st.session_state['user'].email
+    sanitized_email = user_email.replace('@', '_').replace('.', '_')  # Replace special characters
+    timestamp = datetime.now().strftime("%H%M")  # Current time in HHMM format
+    filename = f"{sanitized_email}_{timestamp}_chat_log.txt"
     
     # Save the chat log to a local .txt file
     with open(filename, 'w') as file:
