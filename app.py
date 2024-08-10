@@ -52,9 +52,12 @@ def save_chat_log(messages):
     save_chat_log_to_storage(messages)
 
 # Function to save chat log to a .txt file and upload to Firebase Storage
-def save_chat_log_to_storage(messages, filename="chat_log.txt"):
+def save_chat_log_to_storage(messages):
     # Filter out the system messages
     filtered_messages = [msg for msg in messages if msg['role'] != 'system']
+
+    # Debug: Print filtered messages
+    print("Filtered Messages: ", filtered_messages)
     
     # Convert messages to a single string
     chat_content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
