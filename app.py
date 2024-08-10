@@ -2,6 +2,7 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 from openai import OpenAI
+import time
 
 # Check if Firebase app is already initialized
 if not firebase_admin._apps:
@@ -114,7 +115,11 @@ chat_sidebar()
 
 # Initialize messages if not in session state
 if "messages" not in st.session_state:
+    # Generate a unique chat ID using the user's UID and the current time
+    chat_id = f"chat_{st.session_state['user'].uid}_{int(time.time())}"
+    
     # Update the system prompt with the new detailed instructions
+    st.session_state['chat_id'] = chat_id
     st.session_state["messages"] = [
         {"role": "system", "content": """
 Role: Essay Writing Assistant (300-500 words)
