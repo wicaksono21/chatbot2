@@ -80,15 +80,13 @@ if not st.session_state['logged_in']:
             if user:
                 st.session_state['logged_in'] = True
                 st.session_state['user'] = user
-                # Instead of rerunning, just show the logged-in state in the same session
-                st.experimental_set_query_params(logged_in="true")
+                st.query_params = {"logged_in": "true"}  # Updated from deprecated experimental function
     else:
         if st.button("Login"):
             if login_user(email, password):
-                st.experimental_set_query_params(logged_in="true")
+                st.query_params = {"logged_in": "true"}  # Updated from deprecated experimental function
 
     st.stop()
-
 # User is logged in, continue with the chatbot
 openai_api_key = st.secrets["default"]["OPENAI_API_KEY"]
 
@@ -161,7 +159,7 @@ if prompt := st.chat_input():
         max_tokens=150
     )
     
-    msg = response.choices[0].message['content']
+    msg = response.choices[0].message.content  # Fixed to correctly access content
     st.session_state["messages"].append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
     store_chat_log(msg, role="assistant")
