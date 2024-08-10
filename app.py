@@ -60,8 +60,9 @@ def save_chat_log_to_storage(messages):
     print("Filtered Messages: ", filtered_messages)
     
     # Convert messages to a single string
-    chat_content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
-
+    #chat_content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
+    chat_content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in filtered_messages])
+    
     # Create a filename based on user's email and current timestamp
     user_email = st.session_state['user'].email
     sanitized_email = user_email.replace('@', '_').replace('.', '_')  # Replace special characters
