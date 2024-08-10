@@ -155,7 +155,7 @@ if prompt := st.chat_input():
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=st.session_state["messages"],
-        temperature=1.0,
+        temperature=0.7,
         max_tokens=150
     )
     
