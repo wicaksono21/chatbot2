@@ -28,6 +28,7 @@ if not st.session_state["logged_in"]:
             st.session_state["logged_in"] = True
             st.session_state["username"] = username
             st.success(f"Logged in as {username}")
+            st.experimental_rerun()  # Rerun the app to move to the main UI
         else:
             st.error("Invalid username or password.")
     st.stop()
@@ -79,6 +80,7 @@ Additional Guidelines:
     ]
     st.session_state["messages"].append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
 
+# Display only user and assistant messages, not the system message
 for msg in st.session_state["messages"]:
     if msg["role"] != "system":
         st.chat_message(msg["role"]).write(msg["content"])
