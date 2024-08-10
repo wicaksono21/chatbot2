@@ -1,8 +1,12 @@
 import streamlit as st
 import openai
 
-# Set up the OpenAI client with the API key from Streamlit secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Attempt to retrieve the API key from Streamlit secrets
+try:
+    openai_api_key = st.secrets["default"]["OPENAI_API_KEY"]
+except KeyError:
+    st.error("API key not found! Please ensure that the OPENAI_API_KEY is correctly set in Streamlit secrets.")
+    st.stop()
 
 st.title("💬 Essay Writing Assistant Chatbot-3")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI")
