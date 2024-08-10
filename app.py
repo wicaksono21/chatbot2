@@ -2,18 +2,43 @@ import streamlit as st
 import openai
 from openai import OpenAI
 
-# Attempt to retrieve the API key from Streamlit secrets
-try:
-    openai_api_key = st.secrets["default"]["OPENAI_API_KEY"]
-except KeyError:
-    st.error("API key not found! Please ensure that the OPENAI_API_KEY is correctly set in Streamlit secrets.")
+# Mock user database
+users = {
+    "admin": {"password": "adminpass", "is_admin": True},
+    "user1": {"password": "user1pass", "is_admin": False},
+}
+
+# Function to check login
+def check_login(username, password):
+    if username in users and users[username]["password"] == password:
+        return True
+    return False
+
+# Login page
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
+    st.session_state["username"] = None
+
+if not st.session_state["logged_in"]:
+    st.title("Login")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+        if check_login(username, password):
+            st.session_state["logged_in"] = True
+            st.session_state["username"] = username
+            st.success(f"Logged in as {username}")
+        else:
+            st.error("Invalid username or password.")
     st.stop()
+
+# User is logged in, continue with the chatbot
+openai_api_key = st.secrets["default"]["OPENAI_API_KEY"]
 
 st.title("💬 Essay Writing Assistant Chatbot-3")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI")
 
 if "messages" not in st.session_state:
-    # Update the system prompt with the new detailed instructions
     st.session_state["messages"] = [
         {"role": "system", "content": """
 Role: Essay Writing Assistant (300-500 words)
@@ -52,30 +77,24 @@ Additional Guidelines:
     • Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response.
         """}
     ]
-    # Display the assistant's first message
-    st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!?"})
+    st.session_state["messages"].append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
 
-# Display only user and assistant messages, not the system message
-for msg in st.session_state.messages:
+for msg in st.session_state["messages"]:
     if msg["role"] != "system":
         st.chat_message(msg["role"]).write(msg["content"])
 
 if prompt := st.chat_input():
-    if not openai_api_key:
-        st.info("Please set your OPENAI_API_KEY environment variable.")
-        st.stop()
-
-    client = OpenAI(api_key=openai_api_key)
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.session_state["messages"].append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
+    client = OpenAI(api_key=openai_api_key)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=st.session_state.messages,
+        messages=st.session_state["messages"],
         temperature=1.0,
         max_tokens=150
     )
 
     msg = response.choices[0].message.content
-    st.session_state.messages.append({"role": "assistant", "content": msg})
+    st.session_state["messages"].append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
