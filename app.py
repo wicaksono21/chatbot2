@@ -1,34 +1,90 @@
 import streamlit as st
-import openai
+import firebase_admin
+from firebase_admin import credentials, auth, firestore
 from openai import OpenAI
 
-# Mock user database
-users = {
-    "admin": {"password": "adminpass", "is_admin": True},
-    "user1": {"password": "user1pass", "is_admin": False},
-}
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate("essay-writing-assistant-firebase-adminsdk-rtrnk-f280b8aa38.json")
+firebase_admin.initialize_app(cred)
 
-# Function to check login
-def check_login(username, password):
-    return users.get(username, {}).get("password") == password
+# Initialize Firestore DB
+db = firestore.client()
 
-# Login page
-if "logged_in" not in st.session_state:
-    st.session_state["logged_in"] = False
-    st.session_state["username"] = None
+# Function to register a new user in Firebase Authentication
+def register_user(email, password):
+    try:
+        user = auth.create_user(
+            email=email,
+            password=password
+        )
+        st.success("User registered successfully!")
+        return user
+    except firebase_admin.exceptions.FirebaseError as e:
+        st.error(f"Error registering user: {e}")
+        return None
 
-if not st.session_state["logged_in"]:
-    st.title("Login")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    login_button = st.button("Login")
+# Function to login a user using Firebase Authentication
+def login_user(email, password):
+    try:
+        user = auth.get_user_by_email(email)
+        st.session_state['user'] = user
+        st.session_state['logged_in'] = True
+        st.success(f"Logged in as {user.email}")
+        return True
+    except firebase_admin.exceptions.FirebaseError as e:
+        st.error("Invalid credentials!")
+        return False
+
+# Firestore Collection Reference for Chat Logs
+def get_chat_collection():
+    return db.collection('chat_logs').document(st.session_state['user'].uid)
+
+# Store Chat Log in Firestore
+def store_chat_log(message, role='user'):
+    doc_ref = get_chat_collection()
+    doc = doc_ref.get()
     
-    if login_button and check_login(username, password):
-        st.session_state["logged_in"] = True
-        st.session_state["username"] = username
-        st.experimental_set_query_params(logged_in="true")  # Simulate moving to the next state
-    elif login_button:
-        st.error("Invalid username or password.")
+    if doc.exists:
+        chat_logs = doc.to_dict().get('messages', [])
+    else:
+        chat_logs = []
+
+    chat_logs.append({"role": role, "content": message})
+    doc_ref.set({"messages": chat_logs})
+
+# Retrieve Chat Log from Firestore
+def retrieve_chat_logs():
+    doc_ref = get_chat_collection()
+    doc = doc_ref.get()
+    if doc.exists:
+        return doc.to_dict().get('messages', [])
+    return []
+
+# Check login status
+if 'logged_in' not in st.session_state:
+    st.session_state['logged_in'] = False
+    st.session_state['user'] = None
+
+# Login or Register Form
+if not st.session_state['logged_in']:
+    st.title("Login / Register")
+
+    choice = st.radio("Login or Register", ["Login", "Register"])
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+
+    if choice == "Register":
+        if st.button("Register"):
+            user = register_user(email, password)
+            if user:
+                st.session_state['logged_in'] = True
+                st.session_state['user'] = user
+                st.experimental_rerun()
+    else:
+        if st.button("Login"):
+            if login_user(email, password):
+                st.experimental_rerun()
+
     st.stop()
 
 # User is logged in, continue with the chatbot
@@ -37,7 +93,11 @@ openai_api_key = st.secrets["default"]["OPENAI_API_KEY"]
 st.title("💬 Essay Writing Assistant Chatbot-3")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI")
 
+# Load previous chat history
 if "messages" not in st.session_state:
+    st.session_state["messages"] = retrieve_chat_logs()
+
+if not st.session_state["messages"]:
     st.session_state["messages"] = [
         {"role": "system", "content": """
 Role: Essay Writing Assistant (300-500 words)
@@ -77,16 +137,20 @@ Additional Guidelines:
         """}
     ]
     st.session_state["messages"].append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
+    store_chat_log(" Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
 
-# Display only user and assistant messages, not the system message
+# Display chat messages
 for msg in st.session_state["messages"]:
     if msg["role"] != "system":
         st.chat_message(msg["role"]).write(msg["content"])
 
+# Input for new messages
 if prompt := st.chat_input():
     st.session_state["messages"].append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
+    store_chat_log(prompt, role="user")
 
+    # Simulate AI response using OpenAI
     client = OpenAI(api_key=openai_api_key)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -94,7 +158,8 @@ if prompt := st.chat_input():
         temperature=1.0,
         max_tokens=150
     )
-
-    msg = response.choices[0].message.content
+    
+    msg = response.choices[0].message['content']
     st.session_state["messages"].append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
+    store_chat_log(msg, role="assistant")
