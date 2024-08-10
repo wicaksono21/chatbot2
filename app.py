@@ -23,13 +23,12 @@ if not st.session_state["logged_in"]:
     password = st.text_input("Password", type="password")
     login_button = st.button("Login")
     
-    if login_button:
-        if check_login(username, password):
-            st.session_state["logged_in"] = True
-            st.session_state["username"] = username
-            st.experimental_rerun()  # Rerun the app to show the main UI
-        else:
-            st.error("Invalid username or password.")
+    if login_button and check_login(username, password):
+        st.session_state["logged_in"] = True
+        st.session_state["username"] = username
+        st.experimental_set_query_params(logged_in="true")  # Simulate moving to the next state
+    elif login_button:
+        st.error("Invalid username or password.")
     st.stop()
 
 # User is logged in, continue with the chatbot
