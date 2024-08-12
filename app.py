@@ -105,7 +105,7 @@ def handle_chat(prompt):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=st.session_state["messages"],
-        temperature=0.7,
+        temperature=1,
         max_tokens=150
     )
     
