@@ -192,7 +192,7 @@ Additional Guidelines:
     • Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response.
         """}
     ]
-    st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
+    st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? I'm here to help with everything from topic selection to outlining, drafting, reviewing, and proofreading. What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
     #store_chat_log(" Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
     save_chat_log(st.session_state["messages"])
 
