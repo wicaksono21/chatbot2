@@ -4,11 +4,14 @@ from firebase_admin import credentials, auth, firestore, storage
 from openai import OpenAI
 from datetime import datetime
 
+# Load Firebase credentials from Streamlit secrets
+firebase_credentials = st.secrets["FIREBASE"]
+
 # Check if Firebase app is already initialized
 if not firebase_admin._apps:
-    cred = credentials.Certificate("essay-writing-assistant-firebase-adminsdk-rtrnk-f280b8aa38.json")
+    cred = credentials.Certificate(firebase_credentials)
     firebase_admin.initialize_app(cred, {
-        'storageBucket': 'essay-writing-assistant.appspot.com'
+        'storageBucket': 'firebase_credentials['storage_bucket']
     })
 
 # Initialize Firestore DB
@@ -74,7 +77,7 @@ def save_chat_log_to_storage(messages):
         file.write(chat_content)
 
     # Upload the file to Firebase Storage, explicitly specifying the bucket name
-    bucket_name = 'essay-writing-assistant.appspot.com'
+    bucket_name = firebase_credentials['storage_bucket']
     bucket = storage.bucket(bucket_name)
     blob = bucket.blob(f"chat_logs/{st.session_state['user'].uid}_{filename}")
     blob.upload_from_filename(filename)
