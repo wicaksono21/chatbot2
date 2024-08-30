@@ -18,6 +18,13 @@ if not firebase_admin._apps:
 # Initialize Firestore DB
 db = firestore.client()
 
+# Function to ensure every message has a timestamp
+def ensure_timestamps(messages):
+    for msg in messages:
+        if 'timestamp' not in msg:
+            msg['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return messages
+
 # Function to register a new user in Firebase Authentication
 def register_user(email, password):
     try:
