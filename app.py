@@ -129,8 +129,10 @@ Additional Guidelines:
     ]
     save_chat_log()
 
+# Display chat messages, excluding the system prompt
 for msg in st.session_state["messages"]:
-    st.chat_message(msg["role"]).write(f"[{msg['timestamp']}] {msg['content']}")
+    if msg["role"] != "system":
+        st.chat_message(msg["role"]).write(f"[{msg['timestamp']}] {msg['content']}")
 
 if prompt := st.chat_input():
     handle_chat(prompt)
