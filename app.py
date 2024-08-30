@@ -11,7 +11,7 @@ firebase_credentials = st.secrets["FIREBASE"]
 if not firebase_admin._apps:
     cred = credentials.Certificate(firebase_credentials)
     firebase_admin.initialize_app(cred, {
-        'storageBucket': 'firebase_credentials['storage_bucket']
+        'storageBucket': 'firebase_credentials["storage_bucket"]
     })
 
 # Initialize Firestore DB
