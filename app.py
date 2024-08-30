@@ -56,6 +56,7 @@ def get_chat_collection():
 
 # Function to save chat log to Firestore and Firebase Storage
 def save_chat_log(messages):
+    messages = ensure_timestamps(messages)
     doc_ref = get_chat_collection()
     doc_ref.set({"messages": messages}, merge=True)
     
@@ -64,6 +65,7 @@ def save_chat_log(messages):
 
 # Function to save chat log to a .txt file and upload to Firebase Storage
 def save_chat_log_to_storage(messages):
+    messages = ensure_timestamps(messages)
     # Filter out the system messages
     filtered_messages = [msg for msg in messages if msg['role'] != 'system']
 
@@ -72,7 +74,7 @@ def save_chat_log_to_storage(messages):
     
     # Convert messages to a single string
     #chat_content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
-    chat_content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in filtered_messages])
+    chat_content = "\n".join([f"[{msg['timestamp']}] {msg['role']}: {msg['content']}" for msg in filtered_messages])
     
     # Create a filename based on user's email and current timestamp
     user_email = st.session_state['user'].email
@@ -109,8 +111,8 @@ def retrieve_chat_logs():
 def handle_chat(prompt):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # Append user message to chat history
-    st.session_state["messages"].append({"role": "user", "content": prompt})
+    # Append user message to chat history with timestamp
+    st.session_state["messages"].append({"role": "user", "content": prompt, "timestamp": timestamp})
     st.chat_message("user").write(prompt)
     
     # Simulate AI response using OpenAI
@@ -124,7 +126,7 @@ def handle_chat(prompt):
     
     msg = response.choices[0].message.content
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    st.session_state["messages"].append({"role": "assistant", "content": msg})
+    st.session_state["messages"].append({"role": "assistant", "content": msg, "timestamp": timestamp})
     st.chat_message("assistant").write(msg)
     
     # Automatically save chat logs to Firestore and Firebase Storage
@@ -212,10 +214,15 @@ Additional Guidelines:
     #store_chat_log(" Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
     save_chat_log(st.session_state["messages"])
 
-# Display chat messages
+# Display chat messages with a check for timestamps
 for msg in st.session_state["messages"]:
+    # Ensure every message has a timestamp
+    if "timestamp" not in msg:
+        msg["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     if msg["role"] != "system":
         st.chat_message(msg["role"]).write(f"[{msg['timestamp']}] {msg['content']}")
+
 
 # Input for new messages
 if prompt := st.chat_input():
