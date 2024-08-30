@@ -100,6 +100,8 @@ def retrieve_chat_logs():
 
 # Function to handle chat interactions and store logs
 def handle_chat(prompt):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     # Append user message to chat history
     st.session_state["messages"].append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
@@ -114,6 +116,7 @@ def handle_chat(prompt):
     )
     
     msg = response.choices[0].message.content
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     st.session_state["messages"].append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
     
@@ -196,14 +199,16 @@ Additional Guidelines:
     • Clarifications: Always ask for clarification if the student's request is unclear to avoid giving a complete essay response.
         """}
     ]
-    st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? I'm here to guide and help you improve your essay writing skills through a series of activities, starting with topic selection and continuing through outlining, drafting, reviewing, and proofreading. What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
+    st.session_state.messages.append({"role": "assistant", "content": " Hi there! Ready to start your essay? I'm here to guide and help you improve your essay writing skills through a series of activities, starting with topic selection and continuing through outlining, drafting, reviewing, and proofreading. What topic are you interested in writing about? If you’d like suggestions, just let me know!",
+                                                           "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
+    })
     #store_chat_log(" Hi there! Ready to start your essay? What topic are you interested in writing about? If you’d like suggestions, just let me know!", role="assistant")
     save_chat_log(st.session_state["messages"])
 
 # Display chat messages
 for msg in st.session_state["messages"]:
     if msg["role"] != "system":
-        st.chat_message(msg["role"]).write(msg["content"])
+        st.chat_message(msg["role"]).write(f"[{msg['timestamp']}] {msg['content']}")
 
 # Input for new messages
 if prompt := st.chat_input():
