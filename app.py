@@ -89,7 +89,7 @@ if not st.session_state['logged_in']:
 st.title("💬 Essay Writing Assistant")
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
-        add_timestamp({"role": "assistant", "content": "Hi there! Ready to start your essay? What topic are you interested in?"})
+        add_timestamp({"role": "assistant", "content": "Hi there! Ready to start your essay? I'm here to guide and help you improve your essay writing skills through a series of activities, starting with topic selection and continuing through outlining, drafting, reviewing, and proofreading. What topic are you interested in writing about? If you’d like suggestions, just let me know!"})
     ]
     save_chat_log()
 
