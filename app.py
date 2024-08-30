@@ -3,10 +3,10 @@ import firebase_admin
 from firebase_admin import credentials, auth, firestore, storage
 from openai import OpenAI
 from datetime import datetime
-import json
+
 
 # Load Firebase credentials from Streamlit secrets
-firebase_credentials =json.loads(st.secrets["FIREBASE"])
+firebase_credentials = dict(st.secrets["FIREBASE"])
 
 # Check if Firebase app is already initialized
 if not firebase_admin._apps:
