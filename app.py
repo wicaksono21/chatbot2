@@ -24,7 +24,7 @@ london_tz = pytz.timezone("Europe/London")
 def add_timestamp(message):
     now_london = datetime.now(pytz.utc).astimezone(london_tz)
     message['timestamp'] = now_london.strftime("%Y-%m-%d %H:%M:%S")
-    message['length'] = len(message['content'])
+    message['length'] = len(message['content'].split())  # Count the number of words
     return message
 
 # Function to calculate response time between messages
