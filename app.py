@@ -89,8 +89,7 @@ def handle_chat(prompt):
 
 # Ensure the app reruns after login by tracking login status separately
 def rerun():
-    st.session_state["rerun"] = True
-    st.experimental_rerun()
+    st.experimental_set_query_params(rerun=True)
 
 # Login/Register logic
 if 'logged_in' not in st.session_state:
@@ -112,12 +111,11 @@ if not st.session_state['logged_in']:
                 # Assuming authentication logic here (e.g., matching password)
                 st.session_state['logged_in'] = True
                 st.session_state['user'] = user
-                rerun()  # Immediately rerun the script after successful login
+                rerun()  # Trigger a reload with query params
             except Exception as e:
                 st.error(f"Login failed: {e}")
     
     st.stop()
-
 # Chat UI
 st.title("💬 Essay Writing Assistant")
 if "messages" not in st.session_state:
