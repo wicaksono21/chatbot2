@@ -96,14 +96,18 @@ if not st.session_state['logged_in']:
     st.title("Login / Register")
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
+    
     if st.button("Register"):
         user = auth.create_user(email=email, password=password)
         st.session_state['logged_in'] = True
         st.session_state['user'] = user
+        st.experimental_rerun()  # Immediately rerun the app to reflect login state
+        
     elif st.button("Login"):
         user = auth.get_user_by_email(email)
         st.session_state['logged_in'] = True
         st.session_state['user'] = user
+        st.experimental_rerun()  # Immediately rerun the app to reflect login state
     st.stop()
 
 # Chat UI
