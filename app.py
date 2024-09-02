@@ -87,10 +87,6 @@ def handle_chat(prompt):
     
     save_chat_log()
 
-# Ensure the app reruns after login by tracking login status separately
-def rerun():
-    st.experimental_set_query_params(rerun=True)
-
 # Login/Register logic
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
@@ -98,24 +94,18 @@ if 'logged_in' not in st.session_state:
 
 if not st.session_state['logged_in']:
     st.title("Login / Register")
-    
-    # Using a form to manage login as a single transaction
-    with st.form("login_form", clear_on_submit=True):
-        email = st.text_input("Email")
-        password = st.text_input("Password", type="password")
-        submitted = st.form_submit_button("Login")
-        
-        if submitted:
-            try:
-                user = auth.get_user_by_email(email)
-                # Assuming authentication logic here (e.g., matching password)
-                st.session_state['logged_in'] = True
-                st.session_state['user'] = user
-                rerun()  # Trigger a reload with query params
-            except Exception as e:
-                st.error(f"Login failed: {e}")
-    
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+    if st.button("Register"):
+        user = auth.create_user(email=email, password=password)
+        st.session_state['logged_in'] = True
+        st.session_state['user'] = user
+    elif st.button("Login"):
+        user = auth.get_user_by_email(email)
+        st.session_state['logged_in'] = True
+        st.session_state['user'] = user
     st.stop()
+    
 # Chat UI
 st.title("💬 Essay Writing Assistant")
 if "messages" not in st.session_state:
