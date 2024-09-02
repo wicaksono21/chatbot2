@@ -101,13 +101,13 @@ if not st.session_state['logged_in']:
         user = auth.create_user(email=email, password=password)
         st.session_state['logged_in'] = True
         st.session_state['user'] = user
-        st.experimental_rerun()  # Immediately rerun the app to reflect login state
+        st.experimental_set_query_params(rerun="true")  # Force a rerun by setting query params
         
     elif st.button("Login"):
         user = auth.get_user_by_email(email)
         st.session_state['logged_in'] = True
         st.session_state['user'] = user
-        st.experimental_rerun()  # Immediately rerun the app to reflect login state
+        st.experimental_set_query_params(rerun="true")  # Force a rerun by setting query params
     st.stop()
 
 # Chat UI
