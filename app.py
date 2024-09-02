@@ -6,6 +6,8 @@ from datetime import datetime
 import pytz
 import json
 import csv
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 # Initialize Firebase
 if not firebase_admin._apps:
@@ -87,23 +89,30 @@ def handle_chat(prompt):
     
     save_chat_log()
 
+# Google Authentication
+def authenticate_with_google():
+    st.title("Login with Google")
+    google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id={st.secrets['GOOGLE_CLIENT_ID']}&redirect_uri={st.secrets['REDIRECT_URI']}&scope=email profile"
+
+    st.write(f"[Login with Google]({google_auth_url})")
+
+    # Handle the token returned by Google
+    token = st.experimental_get_query_params().get("token")
+    if token:
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), st.secrets["GOOGLE_CLIENT_ID"])
+        user = auth.get_user_by_email(idinfo["email"])
+        if not user:
+            user = auth.create_user(email=idinfo["email"], display_name=idinfo["name"])
+        st.session_state['logged_in'] = True
+        st.session_state['user'] = user
+
 # Login/Register logic
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
     st.session_state['user'] = None
 
 if not st.session_state['logged_in']:
-    st.title("Login / Register")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    if st.button("Register"):
-        user = auth.create_user(email=email, password=password)
-        st.session_state['logged_in'] = True
-        st.session_state['user'] = user
-    elif st.button("Login"):
-        user = auth.get_user_by_email(email)
-        st.session_state['logged_in'] = True
-        st.session_state['user'] = user
+    authenticate_with_google()
     st.stop()
 
 # Chat UI
