@@ -47,10 +47,21 @@ def save_chat_log():
 
     # Write to CSV
     with open(filename, 'w', newline='') as csvfile:
-        fieldnames = ['timestamp', 'role', 'content', 'length', 'response_time']
+        fieldnames = ['date', 'time', 'role', 'content', 'length', 'response_time']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
-        writer.writerows(st.session_state["messages"])
+        
+        for msg in st.session_state["messages"]:
+            # Split timestamp into date and time
+            date, time = msg['timestamp'].split(' ')
+            writer.writerow({
+                'date': date,
+                'time': time,
+                'role': msg['role'],
+                'content': msg['content'],
+                'length': msg['length'],
+                'response_time': msg.get('response_time', '')
+            })
     
     # Upload CSV file
     bucket = storage.bucket(st.secrets["FIREBASE"]["storage_bucket"])
