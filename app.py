@@ -5,6 +5,7 @@ from openai import OpenAI
 from datetime import datetime
 import pytz
 import json
+import csv
 
 # Initialize Firebase
 if not firebase_admin._apps:
