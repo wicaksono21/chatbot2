@@ -23,26 +23,35 @@ london_tz = pytz.timezone("Europe/London")
 def add_timestamp(message):
     now_london = datetime.now(pytz.utc).astimezone(london_tz)
     message['timestamp'] = now_london.strftime("%Y-%m-%d %H:%M:%S")
+    message['length'] = len(message['content'])
     return message
 
-# Function to save chat log
+# Function to calculate response time between messages
+def calculate_response_time(messages):
+    for i in range(1, len(messages)):
+        current_time = datetime.strptime(messages[i]['timestamp'], "%Y-%m-%d %H:%M:%S")
+        previous_time = datetime.strptime(messages[i-1]['timestamp'], "%Y-%m-%d %H:%M:%S")
+        messages[i]['response_time'] = (current_time - previous_time).total_seconds()
+    return messages
+
+# Function to save chat log in CSV format
 def save_chat_log():
-    # Ensure all messages have timestamps
-    st.session_state["messages"] = [add_timestamp(msg) if 'timestamp' not in msg else msg for msg in st.session_state["messages"]]
+    st.session_state["messages"] = calculate_response_time(
+        [add_timestamp(msg) if 'timestamp' not in msg else msg for msg in st.session_state["messages"]]
+    )
     
-    # Save to Firestore
-    db.collection('chat_logs').document(st.session_state['user'].uid).set({"messages": st.session_state["messages"]}, merge=True)
-    
-    # Save to Firebase Storage
+    # Prepare CSV file path
     user_email = st.session_state['user'].email.replace('@', '_').replace('.', '_')
-    filename = f"{user_email}_{datetime.now(london_tz).strftime('%H%M')}_chat_log.txt"
+    filename = f"{user_email}_{datetime.now(london_tz).strftime('%H%M')}_chat_log.csv"
+
+    # Write to CSV
+    with open(filename, 'w', newline='') as csvfile:
+        fieldnames = ['timestamp', 'role', 'content', 'length', 'response_time']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(st.session_state["messages"])
     
-    # Convert chat to string and save as file
-    chat_content = "\n".join([f"[{msg['timestamp']}] {msg['role']}: {msg['content']}" for msg in st.session_state["messages"] if msg['role'] != 'system'])
-    with open(filename, 'w') as file:
-        file.write(chat_content)
-    
-    # Upload file
+    # Upload CSV file
     bucket = storage.bucket(st.secrets["FIREBASE"]["storage_bucket"])
     blob = bucket.blob(f"chat_logs/{st.session_state['user'].uid}_{filename}")
     blob.upload_from_filename(filename)
