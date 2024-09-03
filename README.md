@@ -1,1 +1,2 @@
-essay writing assistant 2nd version
+# ewa2-summary
+essay writing assistant-summary
