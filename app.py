@@ -152,7 +152,8 @@ Additional Guidelines:
                "3. **Drafting**\n"
                "4. **Reviewing**\n"
                "5. **Proofreading**\n\n"
-               "What topic are you interested in writing about? If you'd like suggestions, just let me know!"})
+               "What topic are you interested in writing about? If you'd like suggestions, just let me know!"
+                      })
     ]
     save_chat_log()
 
