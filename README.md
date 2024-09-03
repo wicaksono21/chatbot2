@@ -1,2 +1,1 @@
-# chatbot2
-essay writing assistant
+essay writing assistant 2nd version
