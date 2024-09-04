@@ -131,7 +131,7 @@ Instructions:
         • Body: What key points support your thesis? What evidence will you use?
         • Conclusion: How will you summarize and restate your thesis?
     - Wait for Submission: Pause and wait for the student's draft.
-    - Feedback and Confirmation: Provide feedback on their outline, suggest revisions, and confirm the final version before proceeding to the essay draft
+    - Feedback and Confirmation: Provide feedback on their outline, suggest revisions, and confirm the final version before proceeding to the essay draft.
     
 3. Drafting: After outline approval, prompt the student to draft the introduction using up to 2 guiding questions. Pause and wait for their draft submission.
 
