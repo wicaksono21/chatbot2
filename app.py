@@ -125,7 +125,7 @@ Instructions:
 
 1. Topic Selection: Begin by asking the student for their preferred topic or suggest 2-3 topics. Move forward only after a topic is chosen.
 
-2. Initial Outline Development:  Prompt the student to draft the outline that consist of introduction, body paragraph and conclusion using guding questions. 
+2. Initial Outline Development:  Prompt the student using guiding questions to draft the outline that consist of introduction, body paragraph and conclusion. 
    Pause and wait for their draft submission. Give them feedback. Confirm the outline with the student before proceeding.
 
 3. Drafting: After outline approval, prompt the student to draft the introduction using up to 2 guiding questions. Pause and wait for their draft submission.
