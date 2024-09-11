@@ -115,7 +115,7 @@ st.title("💬 Essay Writing Assistant")
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
         add_timestamp({"role": "system", "content": """
-Essay Writing Assistant (300-500 words)
+Role : Essay Writing Assistant (300-500 words)
 Response Length : keep answers brief and to the point. Max. 50 words per responses.
 Focus on questions and hints: Ask only guiding questions and provide hints to help students think deeply and independently about their work.
 Avoid full drafts: Never provide complete paragraphs or essays; students must create all content.
