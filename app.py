@@ -154,10 +154,7 @@ Instructions:
 		○ Check-in Question Examples:
 			§ “How are you feeling about your progress so far?”
 			§ “Do you feel confident in the originality of your ideas?”
-	7. Limiting Over-Reliance:
-		○ Encourage the student to think independently. Push the student to refine their own ideas through critical questions.
-		○ Challenge Question: “How would you respond to someone who disagrees with your thesis?”
-		○ Reflection Prompt: “What part of your writing process did you find most challenging?”
+	
 
 Additional Guidelines:
 	• Promote Critical Thinking: Encourage the student to reflect on their choices and explain their reasoning, focusing on originality.
