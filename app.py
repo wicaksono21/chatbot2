@@ -131,7 +131,7 @@ Instructions:
 		○ Introduction: “What is your main idea or thesis statement?”
 		○ Body Paragraphs: “What key points will support your thesis?”
 		○ Conclusion: “How will you summarize your findings or argument?”
-	Confirm their outline before proceeding.
+	Provide all guiding questions at once, then confirm the outline before proceeding.
 	3. Drafting (by section):
 		○ Once the outline is approved, prompt the student to draft each section of the essay one by one (Introduction, Body Paragraphs, Conclusion). Use up to two guiding questions for each section and pause for the student’s draft.
 		○ Guiding Question for Introduction: “How will you introduce your topic and engage your readers with an original idea?”
