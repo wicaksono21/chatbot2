@@ -82,8 +82,8 @@ def handle_chat(prompt):
         model="gpt-4o-mini",
         messages=st.session_state["messages"],
         temperature=1,
-        #presence_penalty=0.5,   # Penalizes repeating ideas
-        #frequency_penalty=0.8,  # Penalizes repeating words too frequently
+        presence_penalty=0.5,   # Penalizes repeating ideas
+        frequency_penalty=0.8,  # Penalizes repeating words too frequently
         max_tokens=150
     )
     st.session_state["messages"].append(add_timestamp({"role": "assistant", "content": response.choices[0].message.content}))
