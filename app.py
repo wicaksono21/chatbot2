@@ -169,7 +169,7 @@ Additional Guidelines:
 	• Strengthening Arguments: Emphasize the importance of logical reasoning, credible evidence, and effectively refuting counterarguments throughout the writing process.
 
         """}),
-        add_timestamp({"role": "assistant", "content": "Hi there! Ready to start your essay? I'm here to guide and help you improve your essay writing skills with activities like:\n"
+        add_timestamp({"role": "assistant", "content": "Hi there! Ready to start your essay? I'm here to guide and help you improve your argumentative essay writing skills with activities like:\n"
                "1. **Topic Selection**\n"
                "2. **Outlining**\n"
                "3. **Drafting**\n"
