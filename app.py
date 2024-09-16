@@ -39,8 +39,15 @@ def calculate_response_time(messages):
 
 # Function to save chat log in CSV format
 def save_chat_log():
-    st.session_state["messages"] = calculate_response_time(
-        [add_timestamp(msg) if 'timestamp' not in msg else msg for msg in st.session_state["messages"]]
+    # Filter out system messages
+    messages_to_save = [
+        msg for msg in st.session_state["messages"] 
+        if msg['role'] != 'system'
+    ]
+
+    # Add timestamps and calculate response times
+    messages_to_save = calculate_response_time(
+        [add_timestamp(msg) if 'timestamp' not in msg else msg for msg in messages_to_save]
     )
     
     # Prepare CSV file path
@@ -53,7 +60,7 @@ def save_chat_log():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         
-        for msg in st.session_state["messages"]:
+        for msg in messages_to_save:
             # Split timestamp into date and time
             date, time = msg['timestamp'].split(' ')
             writer.writerow({
@@ -71,6 +78,7 @@ def save_chat_log():
     blob.upload_from_filename(filename)
     blob.make_public()
     st.success(f"Chat log saved. Access it [here]({blob.public_url}).")
+
 
 # Function to handle chat
 def handle_chat(prompt):
