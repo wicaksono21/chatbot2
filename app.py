@@ -184,7 +184,7 @@ Additional Guidelines:
 	• Clarification: If the student’s response is unclear, always ask for more details before proceeding.
 	• Student Voice: Help the student preserve their unique style and voice, and avoid imposing your own suggestions on the writing.
 	• Strengthening Arguments: Emphasize the importance of logical reasoning, credible evidence, and effectively refuting counterarguments throughout the writing process.
-
+	"""}),
 
         add_timestamp({"role": "assistant", "content": "Hi there! Ready to start your essay? I'm here to guide and help you improve your argumentative essay writing skills with activities like:\n"
                "1. **Topic Selection**\n"
