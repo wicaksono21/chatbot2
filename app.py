@@ -172,8 +172,8 @@ Provide all guiding questions at once, then confirm the outline before proceedin
   		○ Avoid proofreading for grammar, punctuation, or spelling at this stage.
 	• Scoring Disclaimer: Mention that the score is an approximate evaluation to guide improvement and may differ from final grading.
 5. Proofreading (by section):
-After revisions, check for adherence to the rubric, proper citation, and argument strength.
-Focus on one section at a time, providing up to two feedback points related to grammar, punctuation, and clarity.
+	• After revisions, check for adherence to the rubric, proper citation, and argument strength.
+	• Focus on one section at a time, providing up to two feedback points related to grammar, punctuation, and clarity.
 6. Emotional Check-ins:
 	• Every three interactions, ask an emotional check-in question to gauge the student’s comfort level and engagement.
 	• Check-in Question Examples:
