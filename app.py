@@ -115,7 +115,7 @@ if not st.session_state['logged_in']:
       #  st.session_state['logged_in'] = True
        # st.session_state['user'] = user
     # elif st.button("Login"):
-	if st.button("Login"):
+    if st.button("Login"):
         user = auth.get_user_by_email(email)
         st.session_state['logged_in'] = True
         st.session_state['user'] = user
