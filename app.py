@@ -105,14 +105,17 @@ if 'logged_in' not in st.session_state:
     st.session_state['user'] = None
 
 if not st.session_state['logged_in']:
-    st.title("Login / Register")
+    st.title("Login")
+	
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
-    if st.button("Register"):
-        user = auth.create_user(email=email, password=password)
-        st.session_state['logged_in'] = True
-        st.session_state['user'] = user
-    elif st.button("Login"):
+	# Commented out the Register button and its logic
+    #if st.button("Register"):
+     #   user = auth.create_user(email=email, password=password)
+      #  st.session_state['logged_in'] = True
+       # st.session_state['user'] = user
+    # elif st.button("Login"):
+	if st.button("Login"):
         user = auth.get_user_by_email(email)
         st.session_state['logged_in'] = True
         st.session_state['user'] = user
